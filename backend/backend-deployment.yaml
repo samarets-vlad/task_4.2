@@ -4,7 +4,7 @@ metadata:
   name: backend
   namespace: todo-app
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: backend
@@ -15,23 +15,19 @@ spec:
     spec:
       containers:
       - name: backend
-        image: qxf2/todo-backend:latest
+        image: python:3.9.21-alpine
+        command: ["/bin/sh"]
+        args:
+        - -c
+        - |
+          python -c 'from http.server import BaseHTTPRequestHandler, HTTPServer; import json
+          class H(BaseHTTPRequestHandler):
+              def do_GET(self):
+                  self.send_response(200); self.send_header("Content-type", "application/json"); self.end_headers()
+                  self.wfile.write(json.dumps({"status": "ok", "message": "Backend API", "database": "mysql"}).encode())
+          HTTPServer(("0.0.0.0", 5000), H).serve_forever()'
         ports:
         - containerPort: 5000
-        env:
-        - name: MYSQL_HOST
-          value: "mysql"
-        - name: MYSQL_PORT
-          value: "3306"
-        - name: MYSQL_USER
-          value: "root"
-        - name: MYSQL_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mysql-secret
-              key: mysql-root-password
-        - name: MYSQL_DATABASE
-          valueFrom:
-            secretKeyRef:
-              name: mysql-secret
-              key: mysql-database
+        envFrom:
+        - secretRef:
+            name: mysql-secret

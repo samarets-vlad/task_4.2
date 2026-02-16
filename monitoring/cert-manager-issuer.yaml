@@ -1,0 +1,21 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: selfsigned-issuer
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: todo-app-tls
+  namespace: todo-app
+spec:
+  secretName: todo-app-tls-secret
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+  commonName: todo-app.local
+  dnsNames:
+  - todo-app.local
+  - "*.todo-app.local"

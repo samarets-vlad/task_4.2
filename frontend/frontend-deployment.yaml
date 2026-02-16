@@ -4,7 +4,7 @@ metadata:
   name: frontend
   namespace: todo-app
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: frontend
@@ -15,9 +15,13 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: qxf2/todo-frontend:latest
+        image: nginx:1.27.3-alpine
         ports:
-        - containerPort: 3000
-        env:
-        - name: REACT_APP_BACKEND_URL
-          value: "http://backend:5000"
+        - containerPort: 80
+        volumeMounts:
+        - name: html
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: html
+        configMap:
+          name: frontend-html

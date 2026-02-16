@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-html
+  namespace: todo-app
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Todo App</title>
+        <style>
+            body { font-family: Arial; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+            .container { max-width: 600px; margin: 50px auto; background: white; border-radius: 15px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 15px 15px 0 0; }
+            .input-section { padding: 20px; display: flex; gap: 10px; }
+            #todoInput { flex: 1; padding: 15px; border: 2px solid #e9ecef; border-radius: 8px; }
+            #addBtn { padding: 15px 30px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; }
+            .todo-list { padding: 20px; }
+            .todo-item { display: flex; padding: 15px; margin: 10px 0; background: #f8f9fa; border-radius: 8px; }
+            .todo-text { flex: 1; }
+            .delete-btn { padding: 8px 15px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header"><h1>Todo Application</h1></div>
+            <div class="input-section">
+                <input type="text" id="todoInput" placeholder="Add task..."/>
+                <button id="addBtn">Add</button>
+            </div>
+            <div class="todo-list" id="todoList"></div>
+        </div>
+        <script>
+            let todos = JSON.parse(localStorage.getItem('todos')) || [];
+            function render() {
+                document.getElementById('todoList').innerHTML = todos.length ? 
+                    todos.map((t,i) => `<div class="todo-item"><span class="todo-text">${t.text}</span><button class="delete-btn" onclick="del(${i})">Delete</button></div>`).join('') :
+                    '<p style="text-align:center;color:#999;">No tasks</p>';
+            }
+            function add() {
+                const v = document.getElementById('todoInput').value.trim();
+                if(v) { todos.push({text:v}); localStorage.setItem('todos',JSON.stringify(todos)); document.getElementById('todoInput').value=''; render(); }
+            }
+            function del(i) { todos.splice(i,1); localStorage.setItem('todos',JSON.stringify(todos)); render(); }
+            document.getElementById('addBtn').onclick = add;
+            document.getElementById('todoInput').onkeypress = (e) => e.key==='Enter' && add();
+            render();
+        </script>
+    </body>
+    </html>
