@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Chart.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - {{ .Chart.Name }}
+              topologyKey: kubernetes.io/hostname
+      volumes:
+      - name: code
+        configMap:
+          name: {{ .Chart.Name }}-code
+      containers:
+      - name: backend
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            pip install flask flask-cors mysql-connector-python && python /app/app.py
+        env:
+        - name: DB_HOST
+          value: {{ .Values.mysql.host }}
+        - name: DB_NAME
+          value: {{ .Values.mysql.database }}
+        - name: DB_USER
+          value: {{ .Values.mysql.user }}
+        - name: DB_PASSWORD
+          value: {{ .Values.mysql.password }}
+        ports:
+        - containerPort: 5000
+          name: http
+        volumeMounts:
+        - name: code
+          mountPath: /app
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        livenessProbe:
+          httpGet:
+            path: /api
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5

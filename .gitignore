@@ -1,0 +1,18 @@
+# Backups
+*.tar.gz
+*.bak
+*.backup
+
+# Temporary files
+*.tmp
+*.swp
+*~
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
