@@ -20,24 +20,9 @@ spec:
       - name: mysql
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        env:
-        - name: MYSQL_ROOT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Chart.Name }}-secret
-              key: root-password
-        - name: MYSQL_DATABASE
-          value: {{ .Values.auth.database }}
-        - name: MYSQL_USER
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Chart.Name }}-secret
-              key: username
-        - name: MYSQL_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Chart.Name }}-secret
-              key: password
+        envFrom:
+        - secretRef:
+            name: {{ .Chart.Name }}-secret
         ports:
         - containerPort: 3306
           name: mysql
