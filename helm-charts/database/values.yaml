@@ -4,10 +4,10 @@ image:
   pullPolicy: IfNotPresent
 
 auth:
-  rootPassword: "todopass123"
+  rootPassword: ""
   database: "tododb"
   user: "todouser"
-  password: "todopassword"
+  password: ""
 
 persistence:
   size: 1Gi
@@ -16,3 +16,11 @@ persistence:
 service:
   type: ClusterIP
   port: 3306
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"

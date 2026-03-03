@@ -1,0 +1,5 @@
+# Copy this file to values.local.yaml and fill in the values
+# NEVER commit values.local.yaml to git
+
+mysql:
+  password: "your-strong-password"

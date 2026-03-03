@@ -15,7 +15,7 @@ grafana:
   image:
     repository: grafana/grafana
     tag: "10.2.3"
-  adminPassword: "admin123"
+  adminPassword: ""
   allowSignUp: "false"
   service:
     type: NodePort
@@ -56,5 +56,5 @@ blackboxExporter:
 
 certManager:
   enabled: true
-  email: "v.mediocrity@gmail.com"
+  email: ""
   issuerName: "letsencrypt-prod"
