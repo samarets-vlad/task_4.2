@@ -1,0 +1,10 @@
+# Local values with real secrets - NEVER commit
+values.local.yaml
+values.prod.yaml
+*.local.yaml
+
+# Helm
+*.tgz
+
+# OS
+.DS_Store

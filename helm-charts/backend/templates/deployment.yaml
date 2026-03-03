@@ -15,23 +15,30 @@ spec:
       labels:
         {{- include "backend.selectorLabels" . | nindent 8 }}
     spec:
-      volumes:
-      - name: code
-        configMap:
-          name: {{ include "backend.fullname" . }}-code
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
       containers:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        command: ["/bin/sh", "-c"]
-        args:
-        - pip install flask flask-cors mysql-connector-python && python /app/app.py
         ports:
         - containerPort: {{ .Values.service.targetPort }}
           name: http
         envFrom:
         - secretRef:
             name: {{ include "backend.fullname" . }}-secret
-        volumeMounts:
-        - name: code
-          mountPath: /app
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.probes.liveness.path }}
+            port: http
+          initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+          periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.probes.readiness.path }}
+            port: http
+          initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+          periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
